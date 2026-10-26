@@ -1,0 +1,428 @@
+@import "tailwindcss";
+
+/* Military C2 Zero-Glow, Zero-Round Base */
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background-color: #070b12;
+    color: #cbd5e1;
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: -0.01em;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid #22d3ee;
+    outline-offset: 2px;
+  }
+}
+
+/* A restrained command-surface system: depth comes from subtle borders and panels,
+   keeping live telemetry readable without a wall of competing effects. */
+.app-shell {
+  background:
+    radial-gradient(circle at 52% -10%, rgba(22, 78, 99, 0.16), transparent 33%),
+    #090c12;
+}
+
+.app-header {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.app-sidebar {
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.16);
+}
+
+.app-left-sidebar {
+  width: 19rem;
+}
+
+.app-right-sidebar {
+  width: 22rem;
+}
+
+.app-workspace.is-focus-mode .app-sidebar {
+  display: none;
+}
+
+.app-workspace.is-focus-mode .app-map {
+  width: 100%;
+}
+
+.map-toolbar > div {
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.leaflet-control-zoom a {
+  background: #101722 !important;
+  color: #cbd5e1 !important;
+  border-color: #334155 !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(7, 11, 18, 0.78) !important;
+  color: #94a3b8 !important;
+  font-size: 9px !important;
+}
+
+.leaflet-control-attribution a {
+  color: #67e8f9 !important;
+}
+
+/* Tactical vehicle models: headings animate through the vector model, while status is
+   communicated through a restrained halo rather than a constant attention-grabbing glow. */
+.tactical-vehicle-icon {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.vehicle-marker {
+  position: relative;
+  display: grid;
+  width: 62px;
+  height: 76px;
+  place-items: center;
+  isolation: isolate;
+}
+
+.vehicle-model {
+  position: relative;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  transform: rotate(var(--heading));
+  transform-origin: center;
+  filter: drop-shadow(0 3px 5px rgb(0 0 0 / 75%));
+  transition: transform 700ms cubic-bezier(.22, .8, .28, 1), filter 200ms ease;
+}
+
+.vehicle-model svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.vehicle-scan-ring {
+  position: absolute;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--vehicle-accent, #38bdf8);
+  border-radius: 999px;
+  opacity: .32;
+}
+
+.is-selected .vehicle-scan-ring {
+  width: 48px;
+  height: 48px;
+  opacity: .75;
+  animation: vehicle-acquire 1.6s ease-out infinite;
+}
+
+.is-hostile .vehicle-scan-ring {
+  border-color: #fb7185;
+  animation: hostile-track 1.15s ease-in-out infinite;
+}
+
+.is-intercepting .vehicle-model {
+  filter: drop-shadow(0 0 6px rgb(251 191 36 / 75%)) drop-shadow(0 3px 5px rgb(0 0 0 / 75%));
+  animation: intercept-bob 680ms ease-in-out infinite alternate;
+}
+
+.is-neutralized .vehicle-model {
+  opacity: .46;
+  filter: grayscale(1) drop-shadow(0 3px 4px rgb(0 0 0 / 60%));
+}
+
+.vehicle-label {
+  position: absolute;
+  bottom: 0;
+  z-index: 3;
+  border: 1px solid rgb(51 65 85 / 92%);
+  background: rgb(2 6 12 / 92%);
+  padding: 1px 4px;
+  color: #bae6fd;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.is-hostile .vehicle-label { color: #fecdd3; }
+.is-neutralized .vehicle-label { color: #94a3b8; }
+
+.asset-card {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.asset-card:hover { transform: translateX(2px); }
+.asset-card:active { transform: translateX(1px) scale(.99); }
+
+.panel-enter { animation: panel-enter 220ms cubic-bezier(.2, .8, .25, 1) both; }
+
+@keyframes vehicle-acquire {
+  0% { transform: scale(.68); opacity: .82; }
+  72%, 100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes hostile-track {
+  0%, 100% { transform: scale(.88); opacity: .25; }
+  50% { transform: scale(1.2); opacity: .8; }
+}
+
+@keyframes intercept-bob {
+  from { translate: 0 0; }
+  to { translate: 0 -2px; }
+}
+
+@keyframes panel-enter {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  .app-header > div:nth-child(2) {
+    display: none;
+  }
+
+  .app-left-sidebar {
+    width: 16.5rem;
+  }
+
+  .app-right-sidebar {
+    width: 19rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .app-shell {
+    height: auto !important;
+    min-height: 100vh;
+    overflow: auto !important;
+  }
+
+  .app-header {
+    height: auto !important;
+    min-height: 3.25rem;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    padding-block: 0.45rem;
+  }
+
+  .app-header > div:last-child {
+    margin-left: auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .app-workspace {
+    display: grid !important;
+    grid-template-columns: minmax(17rem, 0.85fr) minmax(0, 1.75fr);
+    overflow: visible !important;
+  }
+
+  .app-sidebar {
+    width: auto !important;
+    min-height: 32rem;
+  }
+
+  .app-left-sidebar {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .app-map {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 39rem;
+  }
+
+  .app-right-sidebar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-height: 28rem;
+    border-left: 0;
+    border-top: 1px solid #1e293b;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell > :first-child,
+  .app-shell > :last-child {
+    font-size: 8px;
+    padding-inline: 0.65rem;
+  }
+
+  .app-header > div:first-child span:last-child,
+  .app-header button span,
+  .focus-control {
+    display: none;
+  }
+
+  .app-header > div:last-child {
+    gap: 0.25rem;
+  }
+
+  .app-header button {
+    padding: 0.42rem;
+  }
+
+  .app-workspace {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .app-sidebar,
+  .app-map {
+    width: 100% !important;
+    min-height: auto;
+  }
+
+  .app-left-sidebar {
+    order: 2;
+    height: 38rem;
+    border-right: 0;
+    border-top: 1px solid #1e293b;
+  }
+
+  .app-map {
+    order: 1;
+    height: 31rem;
+    min-height: 31rem;
+  }
+
+  .app-right-sidebar {
+    order: 3;
+    height: 34rem;
+  }
+
+  .map-toolbar {
+    max-width: calc(100% - 1rem);
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .map-toolbar > div:nth-child(2) {
+    max-width: 100%;
+  }
+}
+
+/* Radar Sweep Line (Tactical 1px vector) */
+@keyframes radar-sweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-radar {
+  animation: radar-sweep 5s linear infinite;
+  transform-origin: center;
+}
+
+/* Subtle Military Threat Ping */
+@keyframes threat-pulse {
+  0% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.25;
+  }
+  100% {
+    opacity: 0.9;
+  }
+}
+
+.beacon-pulse {
+  animation: threat-pulse 1.2s steps(2, start) infinite;
+}
+
+/* Industrial Tactical Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #090c12;
+}
+::-webkit-scrollbar-thumb {
+  background: #232d3f;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b475d;
+}
+
+/* Leaflet Container & Tactical Grating */
+.leaflet-container {
+  background: #090c12 !important;
+  font-family: inherit !important;
+}
+
+/* Satellite Mode: Real Tactical Recon Grading */
+.map-satellite .leaflet-tile {
+  filter: contrast(1.2) brightness(0.78) saturate(0.9) !important;
+}
+
+/* High-Contrast Inverted Night Recon Map */
+.map-tactical-night .leaflet-tile {
+  filter: brightness(0.6) invert(1) contrast(2.6) hue-rotate(190deg) saturate(0.18) !important;
+}
+
+/* Industrial Sharp Popups */
+.leaflet-popup-content-wrapper {
+  background: #0d121c !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #334155 !important;
+  border-radius: 0px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9) !important;
+  padding: 0 !important;
+}
+.leaflet-popup-content {
+  margin: 8px 10px !important;
+}
+.leaflet-popup-tip {
+  background: #0d121c !important;
+  border: 1px solid #334155 !important;
+  border-radius: 0px !important;
+}
+
+/* Military Scanlines Effect (Subtle) */
+.scanlines {
+  background: linear-gradient(
+    rgba(18, 24, 38, 0) 50%, 
+    rgba(0, 0, 0, 0.35) 50%
+  );
+  background-size: 100% 4px;
+}
